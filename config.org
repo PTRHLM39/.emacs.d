@@ -1,0 +1,298 @@
+* Configuration
+** Visit and edit this configuration
+Visit with key-sequence *C-c e*
+#+BEGIN_SRC emacs-lisp
+  (defun config-visit ()
+    (interactive)
+    (find-file "~/.emacs.d/config.org"))
+  (global-set-key (kbd "C-c e") 'config-visit)
+#+END_SRC
+Evaluate config with key-sequence *C-c l*
+#+BEGIN_SRC emacs-lisp
+  (defun config-eval ()
+    "Evaluating ~/.emacs.d/config.org at runtime"
+    (interactive)
+    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+  (global-set-key (kbd "C-c l") 'config-eval)
+#+END_SRC
+** Navigation
+*** Mini-buffer
+**** posframe
+#+BEGIN_SRC emacs-lisp
+  (use-package posframe
+    :ensure t)
+#+END_SRC
+**** ivy
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+    :ensure t
+    :diminish (ivy-mode)
+    :bind (("C-x b" . ivy-switch-buffer))
+    :config
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffer t)
+    (setq ivy-count-format "%d/%d ")
+    (setq ivy-display-style 'fancy))
+#+END_SRC
+**** Which-key
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :config
+    (which-key-mode))
+#+END_SRC
+*** List killed text
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel
+    :ensure t
+    :bind
+    (( "M-y" . counsel-yank-pop)
+     :map ivy-minibuffer-map
+     ("M-y" . ivy-next-line)))
+#+END_SRC
+*** Search
+**** Swiper
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :ensure t
+    :bind (("C-s" . swiper-isearch)
+	   ("C-c C-r" . ivy-resume)
+	   ("M-x" . counsel-M-x)
+	   ("C-x C-f" . counsel-find-file))
+    :config
+    (progn
+      (ivy-mode 1)
+      (setq ivy-use-virtual-buffer t)
+      (setq ivy-display-style 'fancy)
+      (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)))
+#+END_SRC
+**** Avy
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind ("M-s" . avy-goto-word-1))
+#+END_SRC
+*** Switch window
+#+BEGIN_SRC emacs-lisp
+  (use-package switch-window
+    :ensure t
+    :config
+    (setq switch-window-input-style 'minibuffer)
+    (setq switch-window-increace 4)
+    (setq switch-window-threshold 2)
+    (setq switch-window-shortcut-style 'qwerty)
+    (setq switch-window-qwerty-shortcuts
+	  '("a" "s" "d" "f" "j" "k" "l" "i" "o"))
+    :bind
+    ([remap other-window] . switch-window))
+#+END_SRC
+**** Follow window-split
+#+BEGIN_SRC emacs-lisp
+  (defun split-and-follow-horizontally ()
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
+
+  (defun split-and-follow-vertically ()
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+#+END_SRC
+** Miscellaneous
+*** Shell
+#+BEGIN_SRC emacs-lisp
+  (defvar my-term-shell "/bin/bash")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list my-term-shell)))
+  (ad-activate 'ansi-term)
+
+  (global-set-key (kbd "M-RET") 'ansi-term)
+#+END_SRC
+*** Disable/Enable
+**** Disable startup-message.
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-message t)
+#+END_SRC
+**** Disable tool-bar.
+#+BEGIN_SRC emacs-lisp
+  (tool-bar-mode -1)
+#+END_SRC
+
+**** Disable menu-bar
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+#+END_SRC
+**** Disable scroll-bar
+#+BEGIN_SRC emacs-lisp
+  (scroll-bar-mode -1)
+#+END_SRC
+**** Disable bell
+#+BEGIN_SRC emacs-lisp
+  (setq ring-bell-function 'ignore)
+#+END_SRC
+**** Disable backups and auto-saves
+#+BEGIN_SRC emacs-lisp
+  (setq make-backup-files nil)
+  (setq quto-save-default nil)
+#+END_SRC
+*** Mode-line
+**** Clock
+#+BEGIN_SRC emacs-lisp
+  (setq display-time-24hr-format t)
+  (setq display-time-format "%H:%M - %d %B %Y")
+  (display-time-mode 1)
+#+END_SRC
+**** Battery indicator
+#+BEGIN_SRC emacs-lisp
+  (use-package fancy-battery
+    :ensure t
+    :config
+    (setq fancy-battery-show-percentage t)
+    (setq battery-update-interval 15)
+    (if window-system
+	(fancy-battery-mode)
+	(display-battery-mode)))
+#+END_SRC
+**** Doom
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-modeline
+    :ensure t)
+  (doom-modeline-init)
+#+END_SRC
+*** Interface
+**** Scrolling
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-conservatively 100)
+#+END_SRC
+**** y-or-n
+#+BEGIN_SRC emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+**** Line-numbers
+#+BEGIN_SRC emacs-lisp
+  (use-package linum-relative
+    :ensure t
+    :config
+    (setq linum-relative-current-symbol "")
+    (add-hook 'prog-mode-hook 'linum-relative-mode))
+#+END_SRC
+** Org-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure t
+    :pin org)
+#+END_SRC
+** Programtext tools
+*** Version control
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t
+    :config
+    (setq magit-push-always-verify nil)
+    (setq git-commit-summary-max-length 50)
+    :bind
+    ("M-g" . magit-status))
+#+END_SRC
+*** Templates
+**** Yasnippets
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :init
+    (yas-global-mode 1))
+#+END_SRC
+**** Snippets
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet-snippets
+    :ensure t)
+#+END_SRC
+*** Error-checking
+**** Flychek
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init
+    (global-flycheck-mode t))
+#+END_SRC
+*** Auto-complete
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure t
+    :config
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 3)
+    (global-company-mode t))
+#+END_SRC
+**** Bash
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'shell-mode-hook 'yas-minor-mode)
+  (add-hook 'shell-mode-hook 'flycheck-mode)
+  (add-hook 'shell-mode-hook 'company-mode)
+
+  (defun shell-mode-company-init ()
+    (setq-local company-backends '((company-shell
+				    company-shell-env
+				    company-etags
+				    company-dabbrev-code)))))
+
+  (use-package company-shell
+  :ensure t
+  :config
+  (require 'company)
+  (add-hook 'shell-mode-hook 'shell-mode-company-init))
+#+END_SRC
+**** C/C++
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'c++-mode-hook 'yas-minor-mode)
+  (add-hook 'c-mode-hook 'yas-minor-mode)
+
+  (use-package flycheck-clang-analyzer
+    :ensure t
+    :config
+    (with-eval-after-load 'flycheck
+      (require 'flycheck-clang-analyzer)
+      (flycheck-clang-analyzer-setup)))
+
+  (with-eval-after-load 'company
+    (add-hook 'c++-mode-hook 'company-mode)
+    (add-hook 'c-mode-hook 'company-mode))
+
+  (use-package company-c-headers
+    :ensure t)
+
+  (use-package company-irony
+    :ensure t
+    :config
+    (setq company-backends '((company-c-headers
+			      company-dabbrev-code
+			      company-irony))))
+
+  (use-package irony
+    :ensure t
+    :config
+    (add-hook 'c++-mode-hook 'irony-mode)
+    (add-hook 'c-mode-hook 'irony-mode)
+    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+#+END_SRC
+**** Lisp
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
+  (add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
+  (add-hook 'emacs-lisp-mode-hook 'company-mode)
+
+  (use-package slime
+    :ensure t
+    :config
+    (setq inferior-lisp-program "/usr/bin/sbcl")
+    (setq slime-contribs '(slime-fancy)))
+
+  (use-package slime-company
+    :ensure t
+    :init
+    (require 'company)
+    (slime-setup '(slime-fancy slime-company)))
+#+END_SRC
