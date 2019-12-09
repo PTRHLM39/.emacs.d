@@ -41,7 +41,44 @@ Evaluate config with key-sequence *C-c l*
     :config
     (which-key-mode))
 #+END_SRC
-*** List killed text
+*** Text-editing
+**** Smartparens
+#+BEGIN_SRC emacs-lisp
+  (use-package smartparens
+    :ensure t
+    :config (require 'smartparens-config)
+    (show-smartparens-global-mode 1)
+    (smartparens-global-mode 1)
+    (sp-use-paredit-bindings))
+#+END_SRC
+**** Mark-multiple
+#+BEGIN_SRC emacs-lisp
+  (use-package mark-multiple
+    :ensure t
+    :bind ("C-c q" . 'mark-next-like-this))
+#+END_SRC
+**** Expand-region
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :bind ("C-q" . er/expand-region))
+#+END_SRC
+**** Delete/kill text
+***** Hungry-delete
+#+BEGIN_SRC emacs-lisp
+  (use-package hungry-delete
+    :ensure t
+    :config
+    (global-hungry-delete-mode))
+#+END_SRC
+***** Zapping to char
+Kill text between cursor and a selected character
+#+BEGIN_SRC emacs-lisp
+  (use-package zzz-to-char
+    :ensure t
+    :bind ("M-z" . zzz-up-to-char))
+#+END_SRC
+***** List killed text
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
     :ensure t
@@ -103,6 +140,11 @@ Evaluate config with key-sequence *C-c l*
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 #+END_SRC
 ** Miscellaneous
+*** Utf-8
+#+BEGIN_SRC emacs-lisp
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+#+END_SRC
 *** Shell
 #+BEGIN_SRC emacs-lisp
   (defvar my-term-shell "/bin/bash")
@@ -163,6 +205,12 @@ Evaluate config with key-sequence *C-c l*
     :ensure t)
   (doom-modeline-init)
 #+END_SRC
+*** Theme
+#+BEGIN_SRC emacs-lisp
+  (use-package faff-theme
+    :ensure t)
+  (load-theme 'faff t)
+#+END_SRC
 *** Interface
 **** Scrolling
 #+BEGIN_SRC emacs-lisp
@@ -216,7 +264,20 @@ Evaluate config with key-sequence *C-c l*
   (use-package flycheck
     :ensure t
     :init
-    (global-flycheck-mode t))
+    (global-flycheck-mode t)
+    (defun disable-flycheck-in-org-src-block ()
+      "Disables flychecks that could be problematic in org-mode"
+      (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+    :hook ((prog-mode . flycheck-mode)
+	   (org-src-mode . disable-flycheck-in-org-src-block)))
+#+END_SRC
+**** Flyspell
+#+BEGIN_SRC emacs-lisp
+  (use-package flyspell
+    :ensure t
+    :hook (
+	   (prog-mode . flyspell-prog-mode)
+	   (text-mode . flyspell-mode)))
 #+END_SRC
 *** Auto-complete
 #+BEGIN_SRC emacs-lisp
@@ -225,7 +286,22 @@ Evaluate config with key-sequence *C-c l*
     :config
     (setq company-idle-delay 0)
     (setq company-minimum-prefix-length 3)
-    (global-company-mode t))
+    (global-company-mode t)
+
+  (custom-set-faces
+   '(company-preview
+     ((t (:foreground "darkgray" :underline t))))
+   '(company-preview-common
+     ((t (:inherit company-preview :weight bold))))
+   '(company-tooltip
+     ((t (:inherit popup-face))))
+   '(company-tooltip-selection
+     ((t (:inherit popup-menu-selection-face))))
+   '(company-tooltip-common
+     ((((type x)) (:inherit company-tooltip))))
+   '(company-tooltip-common-selection
+     ((((type x)) (:inherit company-tooltip-selection :weight bold))
+      (t (:inherit company-tooltip-selection))))))
 #+END_SRC
 **** Bash
 #+BEGIN_SRC emacs-lisp
