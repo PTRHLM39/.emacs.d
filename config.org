@@ -16,6 +16,33 @@ Evaluate config with key-sequence *C-c l*
   (global-set-key (kbd "C-c l") 'config-eval)
 #+END_SRC
 ** Navigation
+*** Arch Linux Pacman
+#+BEGIN_SRC emacs-lisp
+  (use-package system-packages
+    :ensure t
+    :config
+    (add-to-list 'system-packages-supported-package-managers
+	       '(pacman .
+			((default-sudo . nil)
+			 (install . "pacman -S")
+			 (search . "pacman -Ss")
+			 (uninstall . "pacman -Rs")
+			 (update . "pacman -Syu")
+			 (clean-cache . "pacman -Sc")
+			 (log . "cat /var/log/pacman.log")
+			 (get-info . "pacman -Qi")
+			 (get-info-remote . "pacman -Si")
+			 (list-files-provided-by . "pacman -Ql")
+			 (verify-all-packages . "pacman -Qkk")
+			 (verify-all-dependencies . "pacman -Dk")
+			 (remove-orphaned . "pacman -Rns $(pacman -Qtdq)")
+			 (list-installed-packages . "pacman -Qe")
+			 (list-installed-packages-all . "pacman -Q")
+			 (list-dependencies-of . "pacman -Qi")
+			 (noconfirm . "--noconfirm"))))
+    (setq system-packages-use-sudo t)
+    (setq system-packages-package-manager 'pacman))
+#+END_SRC
 *** Mini-buffer
 **** posframe
 #+BEGIN_SRC emacs-lisp
@@ -199,17 +226,25 @@ Kill text between cursor and a selected character
 	(fancy-battery-mode)
 	(display-battery-mode)))
 #+END_SRC
-**** Doom
+**** Smart-mode-line
 #+BEGIN_SRC emacs-lisp
-  (use-package doom-modeline
-    :ensure t)
-  (doom-modeline-init)
+  (use-package smart-mode-line
+    :ensure t
+    :init
+    (setq sml/theme 'dark))
+#+END_SRC
+**** Icons
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+   (use-package all-the-icons
+    :ensure t))
 #+END_SRC
 *** Theme
 #+BEGIN_SRC emacs-lisp
-  (use-package faff-theme
-    :ensure t)
-  (load-theme 'faff t)
+  (use-package moe-theme
+    :ensure t
+    :config
+  (load-theme 'moe-light t))
 #+END_SRC
 *** Interface
 **** Scrolling
@@ -227,6 +262,14 @@ Kill text between cursor and a selected character
     :config
     (setq linum-relative-current-symbol "")
     (add-hook 'prog-mode-hook 'linum-relative-mode))
+#+END_SRC
+**** Pretty symbols
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (use-package pretty-mode
+      :ensure t
+      :config
+      (global-pretty-mode t)))
 #+END_SRC
 ** Org-mode
 #+BEGIN_SRC emacs-lisp
