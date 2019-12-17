@@ -43,6 +43,43 @@ Evaluate config with key-sequence *C-c l*
     (setq system-packages-use-sudo t)
     (setq system-packages-package-manager 'pacman))
 #+END_SRC
+*** Helm | Selection framework
+#+BEGIN_SRC emacs-lisp
+  (use-package helm
+    :ensure t
+    :config
+    (require 'helm-config)
+
+    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
+    (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
+    (define-key helm-map (kbd "C-z") 'helm-select-action)
+    (global-set-key (kbd "M-x") 'helm-M-x)
+    (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+    (global-set-key (kbd "C-x b") 'helm-mini)
+    (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  
+    (when (executable-find "curl")
+      (setq helm-google-suggest-use-curl-p t))
+
+    (setq helm-split-window-inside-p            t
+	  helm-move-to-line-cycle-in-source     t
+	  helm-ff-search-library-in-sexp        t
+	  helm-scroll-amount                    8
+	  helm-ff-file-name-history-use-recentf t
+	  helm-echo-input-in-header-line        t
+	  helm-M-x-fuzzy-match                  t
+	  helm-buffers-fuzzy-matching           t
+	  helm-recentf-fuzzy-match              t
+	  helm-locate-fuzzy-match               t
+	  helm-apropos-fuzzy-match              t)
+
+    (setq helm-autoresize-max-height 0)
+    (setq helm-autoresize-min-height 20)
+
+    (add-to-list 'helm-sources-using-default-as-input 'helm-source-man-pages)
+  
+    (helm-mode 1))
+#+END_SRC
 *** Mini-buffer
 **** posframe
 #+BEGIN_SRC emacs-lisp
@@ -69,6 +106,13 @@ Evaluate config with key-sequence *C-c l*
     (which-key-mode))
 #+END_SRC
 *** Text-editing
+**** Sudo-edit
+#+BEGIN_SRC emacs-lisp
+  (use-package sudo-edit
+    :ensure t
+    :bind
+    ("s-e" . sudo-edit))
+#+END_SRC
 **** Smartparens
 #+BEGIN_SRC emacs-lisp
   (use-package smartparens
@@ -226,12 +270,11 @@ Kill text between cursor and a selected character
 	(fancy-battery-mode)
 	(display-battery-mode)))
 #+END_SRC
-**** Smart-mode-line
+**** Doom-modeline
 #+BEGIN_SRC emacs-lisp
-  (use-package smart-mode-line
+  (use-package doom-modeline
     :ensure t
-    :init
-    (setq sml/theme 'dark))
+    :hook (after-init . doom-modeline-mode))
 #+END_SRC
 **** Icons
 #+BEGIN_SRC emacs-lisp
@@ -278,6 +321,54 @@ Kill text between cursor and a selected character
     :pin org)
 #+END_SRC
 ** Programtext tools
+*** DevOps
+#+BEGIN_SRC emacs-lisp
+  (use-package docker
+    :ensure t
+    :bind ("C-c d" . docker))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package kubernetes
+    :ensure t
+    :commands (kubernetes-overview))
+#+END_SRC
+*** Golang
+**** Gomode
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode
+    :ensure t
+    :config
+    (add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
+    (require 'go-flymake))
+#+END_SRC
+Fetch go-playgound with *M-x go-playgound RET*, add your go-text and hit *C-RET*
+it will then be saved, compiled and executed.
+When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
+#+BEGIN_SRC emacs-lisp
+  (use-package go-playground
+    :ensure t)
+#+END_SRC
+**** gopls auto-complete
+***** lsp-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :commands (lsp lsp-deferred)
+    :hook (go-mode . lsp-deferred))
+
+  (defun lsp-go-install-save-hooks ()
+    (add-hook 'before-save-hook #'lsp-format-buffer t t)
+    (add-hook 'before-save-hook #'lsp-organize-imports t t))
+  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode)
+
+  (use-package company-lsp
+    :ensure t
+    :commands company-lsp)
+#+END_SRC
 *** Version control
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -299,6 +390,9 @@ Kill text between cursor and a selected character
 **** Snippets
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet-snippets
+    :ensure t)
+
+  (use-package go-snippets
     :ensure t)
 #+END_SRC
 *** Error-checking
@@ -323,6 +417,7 @@ Kill text between cursor and a selected character
 	   (text-mode . flyspell-mode)))
 #+END_SRC
 *** Auto-complete
+**** Company
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :ensure t
@@ -414,4 +509,10 @@ Kill text between cursor and a selected character
     :init
     (require 'company)
     (slime-setup '(slime-fancy slime-company)))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-defined
+    :ensure t
+    :config
+    (add-hook 'emacs-lisp-mode-hook 'highlight-defined-mode))
 #+END_SRC
