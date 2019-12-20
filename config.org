@@ -1,5 +1,5 @@
 * Configuration
-This .org-file act's as the emacs-configuration.
+This .org-file acts as the emacs-configuration.
 It's structured in source-blocks and when evaluated,
 it will tangle up into one or more loadable .el-files.
 Their path's are defined in init.el, ready to be loaded.
