@@ -1,5 +1,5 @@
 * Configuration
-This .org-file act's as the emacs-configuration.
+This .org-file acts as the emacs-configuration.
 It's structured in source-blocks and when evaluated,
 it will tangle up into one or more loadable .el-files.
 Their path's are defined in init.el, ready to be loaded.
@@ -51,20 +51,40 @@ Evaluate config with key-sequence *C-c l*
     (setq system-packages-package-manager 'pacman))
 #+END_SRC
 *** Helm | Selection framework
+|---------------+---------------------+------------------------------------------|
+| *Key binding* | *Command*           | *Desciption*                             |
+|---------------+---------------------+------------------------------------------|
+| M-x           | helm-M-x            | List commands                            |
+| M-y           | helm-show-kill-ring | View killed text                         |
+| C-x b         | helm-mini           | View open and recently opened files      |
+| C-x C-f       | helm-find-files     | Find-file                                |
+| C-s           | helm-ff-run-grep    | Run grep                                 |
+| C-c h         | helm-man-woman      | View any manual entry                    |
+| C-c h /       | helm-find           | Unix 'find'                              |
+| C-c h l       | helm-locate         | Unix 'locate'                            |
+| C-c h a       | helm-apropos        | Describe commands, functions & variables |
+| C-c h t       | helm-top            | Runnig processes with top                |
+|---------------+---------------------+------------------------------------------|
 #+BEGIN_SRC emacs-lisp
   (use-package helm
     :ensure t
     :config
     (require 'helm-config)
 
+    ;; Prefix-key
+    (global-set-key (kbd "C-c h") 'helm-command-prefix)
+    (global-unset-key (kbd "C-x c"))
+
     (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
     (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
     (define-key helm-map (kbd "C-z") 'helm-select-action)
+
     (global-set-key (kbd "M-x") 'helm-M-x)
     (global-set-key (kbd "M-y") 'helm-show-kill-ring)
     (global-set-key (kbd "C-x b") 'helm-mini)
     (global-set-key (kbd "C-x C-f") 'helm-find-files)
-  
+    (global-set-key (kbd "C-s") 'helm-ff-run-grep)
+
     (when (executable-find "curl")
       (setq helm-google-suggest-use-curl-p t))
 
@@ -78,34 +98,21 @@ Evaluate config with key-sequence *C-c l*
 	  helm-buffers-fuzzy-matching           t
 	  helm-recentf-fuzzy-match              t
 	  helm-locate-fuzzy-match               t
-	  helm-apropos-fuzzy-match              t)
+	  helm-apropos-fuzzy-match              t
+	  helm-lisp-fuzzy-completion            t)
 
     (setq helm-autoresize-max-height 0)
     (setq helm-autoresize-min-height 20)
 
     (add-to-list 'helm-sources-using-default-as-input 'helm-source-man-pages)
-  
+
     (helm-mode 1))
 #+END_SRC
 *** Mini-buffer
-**** posframe
 #+BEGIN_SRC emacs-lisp
   (use-package posframe
     :ensure t)
 #+END_SRC
-**** ivy
-#+BEGIN_SRC emacs-lisp
-  (use-package ivy
-    :ensure t
-    :diminish (ivy-mode)
-    :bind (("C-x b" . ivy-switch-buffer))
-    :config
-    (ivy-mode 1)
-    (setq ivy-use-virtual-buffer t)
-    (setq ivy-count-format "%d/%d ")
-    (setq ivy-display-style 'fancy))
-#+END_SRC
-**** Which-key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
     :ensure t
@@ -156,28 +163,6 @@ Kill text between cursor and a selected character
     :ensure t
     :bind ("M-z" . zzz-up-to-char))
 #+END_SRC
-*** Search
-**** Swiper
-#+BEGIN_SRC emacs-lisp
-  (use-package swiper
-    :ensure t
-    :bind (("C-s" . swiper-isearch)
-	   ("C-c C-r" . ivy-resume)
-	   ("M-x" . counsel-M-x)
-	   ("C-x C-f" . counsel-find-file))
-    :config
-    (progn
-      (ivy-mode 1)
-      (setq ivy-use-virtual-buffer t)
-      (setq ivy-display-style 'fancy)
-      (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)))
-#+END_SRC
-**** Avy
-#+BEGIN_SRC emacs-lisp
-  (use-package avy
-    :ensure t
-    :bind ("M-s" . avy-goto-word-1))
-#+END_SRC
 *** Switch window
 #+BEGIN_SRC emacs-lisp
   (use-package switch-window
@@ -191,6 +176,12 @@ Kill text between cursor and a selected character
 	  '("a" "s" "d" "f" "j" "k" "l" "i" "o"))
     :bind
     ([remap other-window] . switch-window))
+#+END_SRC
+**** Avy
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind ("M-s" . avy-goto-word-1))
 #+END_SRC
 **** Follow window-split
 #+BEGIN_SRC emacs-lisp
@@ -296,29 +287,29 @@ Kill text between cursor and a selected character
   (use-package linum-relative
     :ensure t
     :config
-    (setq linum-relative-current-symbol "")
+    (setq linum-relative-current-symbol )
     (add-hook 'prog-mode-hook 'linum-relative-mode))
-#+END_SRC
+    #+END_SRC
 **** Pretty symbols
-#+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
   (when window-system
     (use-package pretty-mode
       :ensure t
       :config
       (global-pretty-mode t)))
-#+END_SRC
+     #+END_SRC
 ** Org-mode
-#+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
   (use-package org
     :ensure t
     :pin org)
-#+END_SRC
+   #+END_SRC
 ** Programtext tools
 *** DevOps
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   (use-package docker
     :ensure t
-    :bind ("C-c d" . docker))
+    :bind (C-c d . docker))
 #+END_SRC
 #+BEGIN_SRC emacs-lisp
   (use-package kubernetes
