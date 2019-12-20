@@ -1,4 +1,11 @@
 * Configuration
+This .org-file act's as the emacs-configuration.
+It's structured in source-blocks and when evaluated,
+it will tangle up into one or more loadable .el-files.
+Their path's are defined in init.el, ready to be loaded.
+
+By this way, makes it simple to maintain, read and organize
+files which tend to clutter up easily.
 ** Visit and edit this configuration
 Visit with key-sequence *C-c e*
 #+BEGIN_SRC emacs-lisp
@@ -149,15 +156,6 @@ Kill text between cursor and a selected character
     :ensure t
     :bind ("M-z" . zzz-up-to-char))
 #+END_SRC
-***** List killed text
-#+BEGIN_SRC emacs-lisp
-  (use-package counsel
-    :ensure t
-    :bind
-    (( "M-y" . counsel-yank-pop)
-     :map ivy-minibuffer-map
-     ("M-y" . ivy-next-line)))
-#+END_SRC
 *** Search
 **** Swiper
 #+BEGIN_SRC emacs-lisp
@@ -226,32 +224,27 @@ Kill text between cursor and a selected character
   (global-set-key (kbd "M-RET") 'ansi-term)
 #+END_SRC
 *** Disable/Enable
-**** Disable startup-message.
 #+BEGIN_SRC emacs-lisp
+  ;; Disable startup-message
   (setq inhibit-startup-message t)
-#+END_SRC
-**** Disable tool-bar.
-#+BEGIN_SRC emacs-lisp
-  (tool-bar-mode -1)
-#+END_SRC
 
-**** Disable menu-bar
-#+BEGIN_SRC emacs-lisp
+  ;; Disable tool-bar
+  (tool-bar-mode -1)
+
+  ;; Disable menu-bar
   (menu-bar-mode -1)
-#+END_SRC
-**** Disable scroll-bar
-#+BEGIN_SRC emacs-lisp
+
+  ;; Disable Scroll-bar
   (scroll-bar-mode -1)
-#+END_SRC
-**** Disable bell
-#+BEGIN_SRC emacs-lisp
+
+  ;; Disable bell
   (setq ring-bell-function 'ignore)
-#+END_SRC
-**** Disable backups and auto-saves
-#+BEGIN_SRC emacs-lisp
+
+  ;; Disable backups and auto-save-files
   (setq make-backup-files nil)
   (setq quto-save-default nil)
 #+END_SRC
+
 *** Mode-line
 **** Clock
 #+BEGIN_SRC emacs-lisp
