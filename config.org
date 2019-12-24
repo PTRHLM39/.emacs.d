@@ -23,33 +23,6 @@ Evaluate config with key-sequence *C-c l*
   (global-set-key (kbd "C-c l") 'config-eval)
 #+END_SRC
 ** Navigation
-*** Arch Linux Pacman
-#+BEGIN_SRC emacs-lisp
-  (use-package system-packages
-    :ensure t
-    :config
-    (add-to-list 'system-packages-supported-package-managers
-	       '(pacman .
-			((default-sudo . nil)
-			 (install . "pacman -S")
-			 (search . "pacman -Ss")
-			 (uninstall . "pacman -Rs")
-			 (update . "pacman -Syu")
-			 (clean-cache . "pacman -Sc")
-			 (log . "cat /var/log/pacman.log")
-			 (get-info . "pacman -Qi")
-			 (get-info-remote . "pacman -Si")
-			 (list-files-provided-by . "pacman -Ql")
-			 (verify-all-packages . "pacman -Qkk")
-			 (verify-all-dependencies . "pacman -Dk")
-			 (remove-orphaned . "pacman -Rns $(pacman -Qtdq)")
-			 (list-installed-packages . "pacman -Qe")
-			 (list-installed-packages-all . "pacman -Q")
-			 (list-dependencies-of . "pacman -Qi")
-			 (noconfirm . "--noconfirm"))))
-    (setq system-packages-use-sudo t)
-    (setq system-packages-package-manager 'pacman))
-#+END_SRC
 *** Helm | Selection framework
 |---------------+---------------------+------------------------------------------|
 | *Key binding* | *Command*           | *Desciption*                             |
@@ -58,7 +31,6 @@ Evaluate config with key-sequence *C-c l*
 | M-y           | helm-show-kill-ring | View killed text                         |
 | C-x b         | helm-mini           | View open and recently opened files      |
 | C-x C-f       | helm-find-files     | Find-file                                |
-| C-s           | helm-ff-run-grep    | Run grep                                 |
 | C-c h         | helm-man-woman      | View any manual entry                    |
 | C-c h /       | helm-find           | Unix 'find'                              |
 | C-c h l       | helm-locate         | Unix 'locate'                            |
@@ -69,7 +41,6 @@ Evaluate config with key-sequence *C-c l*
   (use-package helm
     :ensure t
     :config
-    (require 'helm-config)
 
     ;; Prefix-key
     (global-set-key (kbd "C-c h") 'helm-command-prefix)
@@ -79,11 +50,10 @@ Evaluate config with key-sequence *C-c l*
     (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
     (define-key helm-map (kbd "C-z") 'helm-select-action)
 
-    (global-set-key (kbd "M-x") 'helm-M-x)
-    (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-    (global-set-key (kbd "C-x b") 'helm-mini)
-    (global-set-key (kbd "C-x C-f") 'helm-find-files)
-    (global-set-key (kbd "C-s") 'helm-ff-run-grep)
+    (global-set-key (kbd "M-x") #'helm-M-x)
+    (global-set-key (kbd "M-y") #'helm-show-kill-ring)
+    (global-set-key (kbd "C-x b") #'helm-mini)
+    (global-set-key (kbd "C-x C-f") #'helm-find-files)
 
     (when (executable-find "curl")
       (setq helm-google-suggest-use-curl-p t))
@@ -103,16 +73,30 @@ Evaluate config with key-sequence *C-c l*
 
     (setq helm-autoresize-max-height 0)
     (setq helm-autoresize-min-height 20)
-
+    (helm-autoresize-mode 1)
     (add-to-list 'helm-sources-using-default-as-input 'helm-source-man-pages)
 
-    (helm-mode 1))
+    (helm-mode 1)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-projectile
+    :ensure t)
+
+  (use-package projectile
+    :ensure t
+    :config
+    (projectile-mode)
+    (setq projectile-completion-system 'helm
+	  projectile-switch-project-action 'helm-projectile)
+
+    (helm-projectile-on))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package async
+    :ensure t
+    :init (dired-async-mode 1))
 #+END_SRC
 *** Mini-buffer
-#+BEGIN_SRC emacs-lisp
-  (use-package posframe
-    :ensure t)
-#+END_SRC
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
     :ensure t
@@ -268,10 +252,22 @@ Kill text between cursor and a selected character
 #+END_SRC
 *** Theme
 #+BEGIN_SRC emacs-lisp
-  (use-package moe-theme
+  (use-package kaolin-themes
     :ensure t
     :config
-  (load-theme 'moe-light t))
+    (defun set-light-theme ()
+    (interactive)
+    (load-theme 'kaolin-light t))
+
+    (defun set-dark-theme ()
+    (interactive)
+    (load-theme 'kaolin-valley-dark t))
+
+  (let ((current-hour (string-to-number(format-time-string "%H"))))
+    (if (or (< current-hour 6) (> current-hour 16))(set-dark-theme) (set-light-theme))))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+
 #+END_SRC
 *** Interface
 **** Scrolling
@@ -287,7 +283,7 @@ Kill text between cursor and a selected character
   (use-package linum-relative
     :ensure t
     :config
-    (setq linum-relative-current-symbol )
+    (setq linum-relative-current-symbol 1)
     (add-hook 'prog-mode-hook 'linum-relative-mode))
     #+END_SRC
 **** Pretty symbols
@@ -305,17 +301,6 @@ Kill text between cursor and a selected character
     :pin org)
    #+END_SRC
 ** Programtext tools
-*** DevOps
-    #+BEGIN_SRC emacs-lisp
-  (use-package docker
-    :ensure t
-    :bind (C-c d . docker))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp
-  (use-package kubernetes
-    :ensure t
-    :commands (kubernetes-overview))
-#+END_SRC
 *** Golang
 **** Gomode
 #+BEGIN_SRC emacs-lisp
@@ -391,14 +376,6 @@ When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
       (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
     :hook ((prog-mode . flycheck-mode)
 	   (org-src-mode . disable-flycheck-in-org-src-block)))
-#+END_SRC
-**** Flyspell
-#+BEGIN_SRC emacs-lisp
-  (use-package flyspell
-    :ensure t
-    :hook (
-	   (prog-mode . flyspell-prog-mode)
-	   (text-mode . flyspell-mode)))
 #+END_SRC
 *** Auto-complete
 **** Company
