@@ -1,4 +1,4 @@
-;;; init.el --- Small file containing garbage collection, package-archives, bootstraps and load-files.
+;;; init.el --- Small file containing garbage collection, package-archives, bootstraps, asynchronous processing and load-paths.
 
 ;;; Commentary:
 
@@ -6,8 +6,7 @@
 
 ;;; code:
 
-;;; Garbage collection. Makes emacs start up smoother
-;;; Shout out to uncle Dave for bringing this out of the fog.
+;;; Garbage collection. Makes emacs start up smoother ;;;;;;
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6)
 
@@ -27,7 +26,7 @@
 
 (require 'package)
 
-;;; Melpa, package archive
+;;; Melpa, elpa & org package-archive
 
 (setq package-enable-at-startup nil)
 
@@ -48,27 +47,18 @@
 (package-refresh-contents)
 (package-install 'use-package))
 
+
+(setq select-enable-clipboard t)
+
+;; Asynchronous processing
+;; dired
+(autoload 'dired-async-mode "dired-async.el" nil t)
+(dired-async-mode 1)
+
+;; Load-path
+
 (org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
 
-(setq async-bytecomp-allowed-packages '(all))
+(add-to-list 'load-path "~/.emacs.d/lisp")
 
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (kaolin-themes zzz-to-char yasnippet-snippets which-key use-package switch-window sudo-edit smartparens slime-company rich-minority pretty-mode mark-multiple lsp-ui linum-relative hungry-delete highlight-defined helm-projectile go-snippets go-playground flycheck-clang-analyzer fancy-battery expand-region doom-modeline dired-narrow company-shell company-lsp company-irony company-c-headers anaphora))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(company-preview ((t (:foreground "darkgray" :underline t))))
- '(company-preview-common ((t (:inherit company-preview :weight bold))))
- '(company-tooltip ((t (:inherit popup-face))))
- '(company-tooltip-common ((((type x)) (:inherit company-tooltip))))
- '(company-tooltip-common-selection ((((type x)) (:inherit company-tooltip-selection :weight bold)) (t (:inherit company-tooltip-selection))))
- '(company-tooltip-selection ((t (:inherit popup-menu-selection-face)))))

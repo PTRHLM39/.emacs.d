@@ -23,78 +23,28 @@ Evaluate config with key-sequence *C-c l*
   (global-set-key (kbd "C-c l") 'config-eval)
 #+END_SRC
 ** Navigation
-*** Helm | Selection framework
-|---------------+---------------------+------------------------------------------|
-| *Key binding* | *Command*           | *Desciption*                             |
-|---------------+---------------------+------------------------------------------|
-| M-x           | helm-M-x            | List commands                            |
-| M-y           | helm-show-kill-ring | View killed text                         |
-| C-x b         | helm-mini           | View open and recently opened files      |
-| C-x C-f       | helm-find-files     | Find-file                                |
-| C-c h         | helm-man-woman      | View any manual entry                    |
-| C-c h /       | helm-find           | Unix 'find'                              |
-| C-c h l       | helm-locate         | Unix 'locate'                            |
-| C-c h a       | helm-apropos        | Describe commands, functions & variables |
-| C-c h t       | helm-top            | Runnig processes with top                |
-|---------------+---------------------+------------------------------------------|
+*** Helm
 #+BEGIN_SRC emacs-lisp
-  (use-package helm
-    :ensure t
-    :config
+  (require 'helm)
+  (require 'helm-config)
 
-    ;; Prefix-key
-    (global-set-key (kbd "C-c h") 'helm-command-prefix)
-    (global-unset-key (kbd "C-x c"))
+  (global-set-key (kbd "C-c h") 'helm-command-prefix)
+  (global-unset-key (kbd "C-x c"))
 
-    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
-    (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
-    (define-key helm-map (kbd "C-z") 'helm-select-action)
+  (define-key helm-map (kbd "C-z") 'helm-select-action)
 
-    (global-set-key (kbd "M-x") #'helm-M-x)
-    (global-set-key (kbd "M-y") #'helm-show-kill-ring)
-    (global-set-key (kbd "C-x b") #'helm-mini)
-    (global-set-key (kbd "C-x C-f") #'helm-find-files)
+  (setq helm-split-window-in-side-p           t
+	helm-move-to-line-cycle-in-source     t
+	helm-ff-search-library-in-sexp        t
+	helm-ff-file-name-history-use-recentf t)
 
-    (when (executable-find "curl")
-      (setq helm-google-suggest-use-curl-p t))
+  (global-set-key (kbd "M-x") 'helm-M-x)
+  (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+  (global-set-key (kbd "C-s") 'helm-occur-from-isearch)
+  (global-set-key (kbd "C-x /") 'helm-find)
 
-    (setq helm-split-window-inside-p            t
-	  helm-move-to-line-cycle-in-source     t
-	  helm-ff-search-library-in-sexp        t
-	  helm-scroll-amount                    8
-	  helm-ff-file-name-history-use-recentf t
-	  helm-echo-input-in-header-line        t
-	  helm-M-x-fuzzy-match                  t
-	  helm-buffers-fuzzy-matching           t
-	  helm-recentf-fuzzy-match              t
-	  helm-locate-fuzzy-match               t
-	  helm-apropos-fuzzy-match              t
-	  helm-lisp-fuzzy-completion            t)
-
-    (setq helm-autoresize-max-height 0)
-    (setq helm-autoresize-min-height 20)
-    (helm-autoresize-mode 1)
-    (add-to-list 'helm-sources-using-default-as-input 'helm-source-man-pages)
-
-    (helm-mode 1)
-#+END_SRC
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-projectile
-    :ensure t)
-
-  (use-package projectile
-    :ensure t
-    :config
-    (projectile-mode)
-    (setq projectile-completion-system 'helm
-	  projectile-switch-project-action 'helm-projectile)
-
-    (helm-projectile-on))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp
-  (use-package async
-    :ensure t
-    :init (dired-async-mode 1))
+  (helm-mode 1)
 #+END_SRC
 *** Mini-buffer
 #+BEGIN_SRC emacs-lisp
@@ -278,14 +228,6 @@ Kill text between cursor and a selected character
 #+BEGIN_SRC emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
-**** Line-numbers
-#+BEGIN_SRC emacs-lisp
-  (use-package linum-relative
-    :ensure t
-    :config
-    (setq linum-relative-current-symbol 1)
-    (add-hook 'prog-mode-hook 'linum-relative-mode))
-    #+END_SRC
 **** Pretty symbols
      #+BEGIN_SRC emacs-lisp
   (when window-system
@@ -296,9 +238,14 @@ Kill text between cursor and a selected character
      #+END_SRC
 ** Org-mode
    #+BEGIN_SRC emacs-lisp
-  (use-package org
-    :ensure t
-    :pin org)
+     (use-package org
+       :ensure t
+       :pin org
+       :config
+       (org-babel-do-load-languages 'org-babel-load-languages
+				    '(
+				      (shell .t)
+				      )))
    #+END_SRC
 ** Programtext tools
 *** Golang
