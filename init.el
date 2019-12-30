@@ -58,7 +58,6 @@
 ;; Load-path
 
 (org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
-
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
 ;;; init.el ends here

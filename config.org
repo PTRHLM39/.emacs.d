@@ -247,6 +247,12 @@ Kill text between cursor and a selected character
 				      (shell .t)
 				      )))
    #+END_SRC
+** Latex
+#+BEGIN_SRC emacs-lisp
+  (setq TeX-auto-save  t
+	TeX-parse-self t)
+  (setq-default TeX-master nil)
+#+END_SRC
 ** Programtext tools
 *** Golang
 **** Gomode
