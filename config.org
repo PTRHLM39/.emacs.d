@@ -6,13 +6,28 @@ Their path's are defined in init.el, ready to be loaded.
 
 By this way, makes it simple to maintain, read and organize
 files which tend to clutter up easily.
-** Visit and edit this configuration
+** Visit and edit configurations
+Edit emacs configuration.
 Visit with key-sequence *C-c e*
 #+BEGIN_SRC emacs-lisp
   (defun config-visit ()
     (interactive)
     (find-file "~/.emacs.d/config.org"))
   (global-set-key (kbd "C-c e") 'config-visit)
+#+END_SRC
+Edit wm-configuration
+*C-c s*
+#+BEGIN_SRC emacs-lisp
+  (defun stumpwm-visit ()
+    (interactive)
+    (find-file "~/.stumpwm.d/readme.org"))
+  (global-set-key (kbd "C-c s") 'stumpwm-visit)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun bash-visit ()
+    (interactive)
+    (find-file "~/.bashrc.org"))
+  (global-set-key (kbd "C-c b") 'bash-visit)
 #+END_SRC
 Evaluate config with key-sequence *C-c l*
 #+BEGIN_SRC emacs-lisp
@@ -43,8 +58,6 @@ Evaluate config with key-sequence *C-c l*
   (global-set-key (kbd "M-y") 'helm-show-kill-ring)
   (global-set-key (kbd "C-s") 'helm-occur-from-isearch)
   (global-set-key (kbd "C-x /") 'helm-find)
-
-  (helm-mode 1)
 #+END_SRC
 *** Mini-buffer
 #+BEGIN_SRC emacs-lisp
@@ -249,9 +262,19 @@ Kill text between cursor and a selected character
    #+END_SRC
 ** Latex
 #+BEGIN_SRC emacs-lisp
+  (load "auctex.el" nil t t)
+  (load "preview-latex.el" nil t t)
+
   (setq TeX-auto-save  t
 	TeX-parse-self t)
   (setq-default TeX-master nil)
+
+  (setq LaTeX-section-hook
+		  '(LaTeX-section-heading
+		  LaTeX-section-title
+		  LaTeX-section-toc
+		  LaTeX-section-section
+		  LaTeX-section-label))
 #+END_SRC
 ** Programtext tools
 *** Golang
