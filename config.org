@@ -59,6 +59,7 @@ Evaluate config with key-sequence *C-c l*
   (global-set-key (kbd "C-s") 'helm-occur-from-isearch)
   (global-set-key (kbd "C-x /") 'helm-find)
 #+END_SRC
+**** Helm-spotify
 *** Mini-buffer
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
@@ -159,7 +160,7 @@ Kill text between cursor and a selected character
     (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
 
-  (global-set-key (kbd "M-RET") 'ansi-term)
+  (global-set-key (kbd "C-.") 'ansi-term)
 #+END_SRC
 *** Disable/Enable
 #+BEGIN_SRC emacs-lisp
@@ -215,19 +216,10 @@ Kill text between cursor and a selected character
 #+END_SRC
 *** Theme
 #+BEGIN_SRC emacs-lisp
-  (use-package kaolin-themes
+  (use-package nord-theme
     :ensure t
     :config
-    (defun set-light-theme ()
-    (interactive)
-    (load-theme 'kaolin-light t))
-
-    (defun set-dark-theme ()
-    (interactive)
-    (load-theme 'kaolin-valley-dark t))
-
-  (let ((current-hour (string-to-number(format-time-string "%H"))))
-    (if (or (< current-hour 6) (> current-hour 16))(set-dark-theme) (set-light-theme))))
+    (load-theme 'nord t))
 #+END_SRC
 #+BEGIN_SRC emacs-lisp
 
@@ -249,71 +241,7 @@ Kill text between cursor and a selected character
       :config
       (global-pretty-mode t)))
      #+END_SRC
-** Org-mode
-   #+BEGIN_SRC emacs-lisp
-     (use-package org
-       :ensure t
-       :pin org
-       :config
-       (org-babel-do-load-languages 'org-babel-load-languages
-				    '(
-				      (shell .t)
-				      )))
-   #+END_SRC
-** Latex
-#+BEGIN_SRC emacs-lisp
-  (load "auctex.el" nil t t)
-  (load "preview-latex.el" nil t t)
-
-  (setq TeX-auto-save  t
-	TeX-parse-self t)
-  (setq-default TeX-master nil)
-
-  (setq LaTeX-section-hook
-		  '(LaTeX-section-heading
-		  LaTeX-section-title
-		  LaTeX-section-toc
-		  LaTeX-section-section
-		  LaTeX-section-label))
-#+END_SRC
 ** Programtext tools
-*** Golang
-**** Gomode
-#+BEGIN_SRC emacs-lisp
-  (use-package go-mode
-    :ensure t
-    :config
-    (add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
-    (require 'go-flymake))
-#+END_SRC
-Fetch go-playgound with *M-x go-playgound RET*, add your go-text and hit *C-RET*
-it will then be saved, compiled and executed.
-When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
-#+BEGIN_SRC emacs-lisp
-  (use-package go-playground
-    :ensure t)
-#+END_SRC
-**** gopls auto-complete
-***** lsp-mode
-#+BEGIN_SRC emacs-lisp
-  (use-package lsp-mode
-    :ensure t
-    :commands (lsp lsp-deferred)
-    :hook (go-mode . lsp-deferred))
-
-  (defun lsp-go-install-save-hooks ()
-    (add-hook 'before-save-hook #'lsp-format-buffer t t)
-    (add-hook 'before-save-hook #'lsp-organize-imports t t))
-  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-
-  (use-package lsp-ui
-    :ensure t
-    :commands lsp-ui-mode)
-
-  (use-package company-lsp
-    :ensure t
-    :commands company-lsp)
-#+END_SRC
 *** Version control
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -378,7 +306,7 @@ When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
      ((((type x)) (:inherit company-tooltip-selection :weight bold))
       (t (:inherit company-tooltip-selection))))))
 #+END_SRC
-**** Bash
+**** Shell
 #+BEGIN_SRC emacs-lisp
   (add-hook 'shell-mode-hook 'yas-minor-mode)
   (add-hook 'shell-mode-hook 'flycheck-mode)
@@ -388,7 +316,7 @@ When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
     (setq-local company-backends '((company-shell
 				    company-shell-env
 				    company-etags
-				    company-dabbrev-code)))))
+				    company-dabbrev-code))))
 
   (use-package company-shell
   :ensure t
@@ -396,9 +324,8 @@ When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
   (require 'company)
   (add-hook 'shell-mode-hook 'shell-mode-company-init))
 #+END_SRC
-**** C/C++
+**** C
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'c++-mode-hook 'yas-minor-mode)
   (add-hook 'c-mode-hook 'yas-minor-mode)
 
   (use-package flycheck-clang-analyzer
@@ -409,7 +336,6 @@ When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
       (flycheck-clang-analyzer-setup)))
 
   (with-eval-after-load 'company
-    (add-hook 'c++-mode-hook 'company-mode)
     (add-hook 'c-mode-hook 'company-mode))
 
   (use-package company-c-headers
@@ -425,7 +351,6 @@ When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
   (use-package irony
     :ensure t
     :config
-    (add-hook 'c++-mode-hook 'irony-mode)
     (add-hook 'c-mode-hook 'irony-mode)
     (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 #+END_SRC
@@ -453,3 +378,89 @@ When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
     :config
     (add-hook 'emacs-lisp-mode-hook 'highlight-defined-mode))
 #+END_SRC
+*** Go
+**** Gomode
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode
+    :ensure t
+    :config
+    (add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
+    (require 'go-flymake))
+#+END_SRC
+Fetch go-playgound with *M-x go-playgound RET*, add your go-text and hit *C-RET*
+it will then be saved, compiled and executed.
+When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
+#+BEGIN_SRC emacs-lisp
+  (use-package go-playground
+    :ensure t)
+#+END_SRC
+**** gopls auto-complete
+***** lsp-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :commands (lsp lsp-deferred)
+    :hook (go-mode . lsp-deferred))
+
+  (defun lsp-go-install-save-hooks ()
+    (add-hook 'before-save-hook #'lsp-format-buffer t t)
+    (add-hook 'before-save-hook #'lsp-organize-imports t t))
+  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode)
+
+  (use-package company-lsp
+    :ensure t
+    :commands company-lsp)
+#+END_SRC
+*** Org-mode
+   #+BEGIN_SRC emacs-lisp
+     (use-package org
+       :ensure t
+       :pin org
+       :config
+       (org-babel-do-load-languages 'org-babel-load-languages
+				    '(
+				      (shell .t)
+				      )))
+   #+END_SRC
+*** Latex
+#+BEGIN_SRC emacs-lisp
+  (load "auctex.el" nil t t)
+  (load "preview-latex.el" nil t t)
+
+  (setq TeX-auto-save  t
+	TeX-parse-self t)
+  (setq-default TeX-master nil)
+
+  (setq LaTeX-section-hook
+		  '(LaTeX-section-heading
+		  LaTeX-section-title
+		  LaTeX-section-toc
+		  LaTeX-section-section
+		  LaTeX-section-label))
+#+END_SRC
+** IDE-layout
+Will look similar to vscode-layout when editing C, go and lisp.
+- Toggled with key-sequence ex. C-c i c for c-languages or C-c i l for lisp
+*** File-browser-tree
+Tree-macs
+*** Linenumbers
+#+BEGIN_SRC emacs-lisp
+  (setq line-number-mode t)
+  (setq column-number-mode t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package linum-relative
+    :ensure t
+    :config
+    (add-hook 'prog-mode-hook 'linum-relative-mode))
+#+END_SRC
+*** Code-map
+*** shell 
+Ansi-term
+*** Debugger
+Some debugger through ansi-term 
+*** Stackoverflow
