@@ -443,18 +443,15 @@ When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
 		  LaTeX-section-label))
 #+END_SRC
 ** IDE-layout
-VScode is great, but still emacs is a bit greater as an editor, imo.
-
-The objective in this section, is to make the emacs build look similar to vscode's layout.
 *** File-browser
+
 #+BEGIN_SRC emacs-lisp
   (use-package treemacs
     :ensure t
     :defer t
     :config
     (progn
-      (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
-            treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist")
+      (setq treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist")
 	    treemacs-deferred-git-apply-delay      0.5
 	    treemacs-directory-name-transformer    #'identity
 	    treemacs-display-in-side-window        t
@@ -464,7 +461,6 @@ The objective in this section, is to make the emacs build look similar to vscode
 	    treemacs-file-follow-delay             0.2
 	    treemacs-file-name-transformer         #'identity
 	    treemacs-follow-after-init             t
-	    treemacs-git-command-pipe              " "
 	    treemacs-is-never-other-window         nil
 	    treemacs-max-git-entries               5000
 	    treemacs-missing-project-action        'ask
@@ -489,20 +485,15 @@ The objective in this section, is to make the emacs build look similar to vscode
 
       (treemacs-follow-mode t)
       (treemacs-filewatch-mode t)
-      (treemacs-fringe-indicator-mode t)
-      (pcase (cons (not (null (executable-find "git")))
-		   (not (null treemacs-python-executable)))
-	('(t . t)
-	 (treemacs-git-mode))
-	('(t . _)
-	 (treemacs-git-mode 'simple))))
+      (treemacs-fringe-indicator-mode t))
     :bind
     (:map global-map
 	  ("C-x t 1"   . treemacs-delete-other-windows)
 	  ("C-x t t"   . treemacs)
 	  ("C-x t B"   . treemacs-bookmark)
 	  ("C-x t C-t" . treemacs-find-file)
-	  ("C-x t M-t" . treemacs-find-tag)))
+	  ("C-x t M-t" . treemacs-find-tag)
+	  ("C-x t n"   . treemacs-add-project)))
 #+END_SRC
 *** Linenumbers
 #+BEGIN_SRC emacs-lisp
@@ -519,10 +510,13 @@ The objective in this section, is to make the emacs build look similar to vscode
 Awesome-tabs!
 #+BEGIN_SRC emacs-lisp
   (use-package awesome-tab
-    :load-path "~/.emacs.d/lisp/awesome-tab.el)"
+    :load-path "~/.emacs.d/lisp/"
     :config
     (awesome-tab-mode t))
 #+END_SRC
-*** Code-map 
+*** Shell 
+#+BEGIN_SRC emacs-lisp
+  (require 'aweshell)
+#+END_SRC
 *** Stackoverflow
 https://github.com/atykhonov/emacs-howdoi

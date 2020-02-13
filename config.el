@@ -340,8 +340,7 @@
   :defer t
   :config
   (progn
-    (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
-          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist")
+    (setq treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist")
 	  treemacs-deferred-git-apply-delay      0.5
 	  treemacs-directory-name-transformer    #'identity
 	  treemacs-display-in-side-window        t
@@ -351,7 +350,6 @@
 	  treemacs-file-follow-delay             0.2
 	  treemacs-file-name-transformer         #'identity
 	  treemacs-follow-after-init             t
-	  treemacs-git-command-pipe              " "
 	  treemacs-is-never-other-window         nil
 	  treemacs-max-git-entries               5000
 	  treemacs-missing-project-action        'ask
@@ -376,20 +374,15 @@
 
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode t)
-    (pcase (cons (not (null (executable-find "git")))
-		 (not (null treemacs-python-executable)))
-      ('(t . t)
-       (treemacs-git-mode))
-      ('(t . _)
-       (treemacs-git-mode 'simple))))
+    (treemacs-fringe-indicator-mode t))
   :bind
   (:map global-map
 	("C-x t 1"   . treemacs-delete-other-windows)
 	("C-x t t"   . treemacs)
 	("C-x t B"   . treemacs-bookmark)
 	("C-x t C-t" . treemacs-find-file)
-	("C-x t M-t" . treemacs-find-tag)))
+	("C-x t M-t" . treemacs-find-tag)
+	("C-x t n"   . treemacs-add-project)))
 
 (setq line-number-mode t)
 (setq column-number-mode t)
@@ -400,6 +393,8 @@
   (add-hook 'prog-mode-hook 'linum-relative-mode))
 
 (use-package awesome-tab
-  :load-path "~/.emacs.d/lisp/awesome-tab.el)"
+  :load-path "~/.emacs.d/lisp/"
   :config
   (awesome-tab-mode t))
+
+(require 'aweshell)
