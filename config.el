@@ -131,6 +131,9 @@
 (setq make-backup-files nil)
 (setq quto-save-default nil)
 
+;; Save session
+;;(desktop-save-mode 1)
+
 (setq display-time-24hr-format t)
 (setq display-time-format "%H:%M - %d %B %Y")
 (display-time-mode 1)
@@ -168,6 +171,19 @@
     :ensure t
     :config
     (global-pretty-mode t)))
+
+(use-package slime
+    :ensure t
+    :config
+    (setq inferior-lisp-program "/usr/bin/sbcl")
+    (setq slime-contribs '(slime-fancy)))
+
+(add-hook 'slime-load-hook
+	   (lambda ()
+	     (define-key slime-prefix-map (kbd "M-h")'slime-documentation-lookup)))
+
+(setq slime-lisp-implementations
+      '((sbcl ("sbcl" "--core" "sbcl.core-for-slime"))))
 
 (use-package magit
   :ensure t
@@ -267,12 +283,6 @@
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 (add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
 (add-hook 'emacs-lisp-mode-hook 'company-mode)
-
-(use-package slime
-  :ensure t
-  :config
-  (setq inferior-lisp-program "/usr/bin/sbcl")
-  (setq slime-contribs '(slime-fancy)))
 
 (use-package slime-company
   :ensure t

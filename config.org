@@ -182,6 +182,9 @@ Kill text between cursor and a selected character
   ;; Disable backups and auto-save-files
   (setq make-backup-files nil)
   (setq quto-save-default nil)
+
+  ;; Save session
+  ;;(desktop-save-mode 1)
 #+END_SRC
 
 *** Mode-line
@@ -242,6 +245,21 @@ Kill text between cursor and a selected character
       (global-pretty-mode t)))
      #+END_SRC
 ** Programtext tools
+*** Slime
+#+BEGIN_SRC emacs-lisp
+  (use-package slime
+      :ensure t
+      :config
+      (setq inferior-lisp-program "/usr/bin/sbcl")
+      (setq slime-contribs '(slime-fancy)))
+
+  (add-hook 'slime-load-hook
+	     (lambda ()
+	       (define-key slime-prefix-map (kbd "M-h")'slime-documentation-lookup)))
+
+  (setq slime-lisp-implementations
+	'((sbcl ("sbcl" "--core" "sbcl.core-for-slime"))))
+#+END_SRC
 *** Version control
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -359,12 +377,6 @@ Kill text between cursor and a selected character
   (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
   (add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
   (add-hook 'emacs-lisp-mode-hook 'company-mode)
-
-  (use-package slime
-    :ensure t
-    :config
-    (setq inferior-lisp-program "/usr/bin/sbcl")
-    (setq slime-contribs '(slime-fancy)))
 
   (use-package slime-company
     :ensure t
@@ -518,5 +530,4 @@ Awesome-tabs!
 #+BEGIN_SRC emacs-lisp
   (require 'aweshell)
 #+END_SRC
-*** Stackoverflow
-https://github.com/atykhonov/emacs-howdoi
+
