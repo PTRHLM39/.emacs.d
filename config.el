@@ -43,6 +43,14 @@
   :config
   (which-key-mode))
 
+(setq line-number-mode t)
+(setq column-number-mode t)
+
+(use-package linum-relative
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook 'linum-relative-mode))
+
 (use-package sudo-edit
   :ensure t
   :bind
@@ -134,18 +142,18 @@
 ;; Save session
 ;;(desktop-save-mode 1)
 
-(setq display-time-24hr-format t)
-(setq display-time-format "%H:%M - %d %B %Y")
-(display-time-mode 1)
+;;(setq display-time-24hr-format t)
+;;(setq display-time-format "%H:%M - %d %B %Y")
+;;(display-time-mode 1)
 
-(use-package fancy-battery
-  :ensure t
-  :config
-  (setq fancy-battery-show-percentage t)
-  (setq battery-update-interval 15)
-  (if window-system
-      (fancy-battery-mode)
-      (display-battery-mode)))
+;;(use-package fancy-battery
+;;  :ensure t
+;;  :config
+;;  (setq fancy-battery-show-percentage t)
+;;  (setq battery-update-interval 15)
+;;  (if window-system
+;;      (fancy-battery-mode)
+;;      (display-battery-mode)))
 
 (use-package doom-modeline
   :ensure t
@@ -155,10 +163,10 @@
  (use-package all-the-icons
   :ensure t))
 
-(use-package nord-theme
+(use-package monokai-theme
   :ensure t
   :config
-  (load-theme 'nord t))
+  (load-theme 'monokai t))
 
 
 
@@ -184,6 +192,21 @@
 
 (setq slime-lisp-implementations
       '((sbcl ("sbcl" "--core" "sbcl.core-for-slime"))))
+
+(add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
+(add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
+(add-hook 'emacs-lisp-mode-hook 'company-mode)
+
+(use-package slime-company
+  :ensure t
+  :init
+  (require 'company)
+  (slime-setup '(slime-fancy slime-company)))
+
+(use-package highlight-defined
+  :ensure t
+  :config
+  (add-hook 'emacs-lisp-mode-hook 'highlight-defined-mode))
 
 (use-package magit
   :ensure t
@@ -252,49 +275,6 @@
 (require 'company)
 (add-hook 'shell-mode-hook 'shell-mode-company-init))
 
-(add-hook 'c-mode-hook 'yas-minor-mode)
-
-(use-package flycheck-clang-analyzer
-  :ensure t
-  :config
-  (with-eval-after-load 'flycheck
-    (require 'flycheck-clang-analyzer)
-    (flycheck-clang-analyzer-setup)))
-
-(with-eval-after-load 'company
-  (add-hook 'c-mode-hook 'company-mode))
-
-(use-package company-c-headers
-  :ensure t)
-
-(use-package company-irony
-  :ensure t
-  :config
-  (setq company-backends '((company-c-headers
-			    company-dabbrev-code
-			    company-irony))))
-
-(use-package irony
-  :ensure t
-  :config
-  (add-hook 'c-mode-hook 'irony-mode)
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
-
-(add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
-(add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
-(add-hook 'emacs-lisp-mode-hook 'company-mode)
-
-(use-package slime-company
-  :ensure t
-  :init
-  (require 'company)
-  (slime-setup '(slime-fancy slime-company)))
-
-(use-package highlight-defined
-  :ensure t
-  :config
-  (add-hook 'emacs-lisp-mode-hook 'highlight-defined-mode))
-
 (use-package go-mode
   :ensure t
   :config
@@ -344,67 +324,3 @@
 		LaTeX-section-toc
 		LaTeX-section-section
 		LaTeX-section-label))
-
-(use-package treemacs
-  :ensure t
-  :defer t
-  :config
-  (progn
-    (setq treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist")
-	  treemacs-deferred-git-apply-delay      0.5
-	  treemacs-directory-name-transformer    #'identity
-	  treemacs-display-in-side-window        t
-	  treemacs-eldoc-display                 t
-	  treemacs-file-event-delay              5000
-	  treemacs-file-extension-regex          treemacs-last-period-regex-value
-	  treemacs-file-follow-delay             0.2
-	  treemacs-file-name-transformer         #'identity
-	  treemacs-follow-after-init             t
-	  treemacs-is-never-other-window         nil
-	  treemacs-max-git-entries               5000
-	  treemacs-missing-project-action        'ask
-	  treemacs-no-png-images                 nil
-	  treemacs-no-delete-other-window        t
-	  treemacs-project-follow-cleanup        nil
-	  treemacs-position                      'left
-	  treemacs-recenter-distance             0.1
-	  treemacs-recenter-after-file-follow    nil
-	  treemacs-recenter-after-tag-follow     nil
-	  treemacs-recenter-after-project-jump   'always
-	  treemacs-recenter-after-project-expand 'on-distance
-	  treemacs-show-cursor                   nil
-	  treemacs-show-hidden-files             t
-	  treemacs-silent-filewatch              nil
-	  treemacs-silent-refresh                nil
-	  treemacs-sorting                       'alphabetic-asc
-	  treemacs-space-between-root-nodes      t
-	  treemacs-tag-follow-cleanup            t
-	  treemacs-tag-follow-delay              1.5
-	  treemacs-width                         35)
-
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode t))
-  :bind
-  (:map global-map
-	("C-x t 1"   . treemacs-delete-other-windows)
-	("C-x t t"   . treemacs)
-	("C-x t B"   . treemacs-bookmark)
-	("C-x t C-t" . treemacs-find-file)
-	("C-x t M-t" . treemacs-find-tag)
-	("C-x t n"   . treemacs-add-project)))
-
-(setq line-number-mode t)
-(setq column-number-mode t)
-
-(use-package linum-relative
-  :ensure t
-  :config
-  (add-hook 'prog-mode-hook 'linum-relative-mode))
-
-(use-package awesome-tab
-  :load-path "~/.emacs.d/lisp/"
-  :config
-  (awesome-tab-mode t))
-
-(require 'aweshell)

@@ -67,6 +67,17 @@ Evaluate config with key-sequence *C-c l*
     :config
     (which-key-mode))
 #+END_SRC
+*** Linenumbers
+#+BEGIN_SRC emacs-lisp
+  (setq line-number-mode t)
+  (setq column-number-mode t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package linum-relative
+    :ensure t
+    :config
+    (add-hook 'prog-mode-hook 'linum-relative-mode))
+#+END_SRC
 *** Text-editing
 **** Sudo-edit
 #+BEGIN_SRC emacs-lisp
@@ -190,20 +201,20 @@ Kill text between cursor and a selected character
 *** Mode-line
 **** Clock
 #+BEGIN_SRC emacs-lisp
-  (setq display-time-24hr-format t)
-  (setq display-time-format "%H:%M - %d %B %Y")
-  (display-time-mode 1)
+  ;;(setq display-time-24hr-format t)
+  ;;(setq display-time-format "%H:%M - %d %B %Y")
+  ;;(display-time-mode 1)
 #+END_SRC
 **** Battery indicator
 #+BEGIN_SRC emacs-lisp
-  (use-package fancy-battery
-    :ensure t
-    :config
-    (setq fancy-battery-show-percentage t)
-    (setq battery-update-interval 15)
-    (if window-system
-	(fancy-battery-mode)
-	(display-battery-mode)))
+  ;;(use-package fancy-battery
+  ;;  :ensure t
+  ;;  :config
+  ;;  (setq fancy-battery-show-percentage t)
+  ;;  (setq battery-update-interval 15)
+  ;;  (if window-system
+  ;;      (fancy-battery-mode)
+  ;;      (display-battery-mode)))
 #+END_SRC
 **** Doom-modeline
 #+BEGIN_SRC emacs-lisp
@@ -219,10 +230,10 @@ Kill text between cursor and a selected character
 #+END_SRC
 *** Theme
 #+BEGIN_SRC emacs-lisp
-  (use-package nord-theme
+  (use-package monokai-theme
     :ensure t
     :config
-    (load-theme 'nord t))
+    (load-theme 'monokai t))
 #+END_SRC
 #+BEGIN_SRC emacs-lisp
 
@@ -245,7 +256,8 @@ Kill text between cursor and a selected character
       (global-pretty-mode t)))
      #+END_SRC
 ** Programtext tools
-*** Slime
+*** Lisp
+**** Slime
 #+BEGIN_SRC emacs-lisp
   (use-package slime
       :ensure t
@@ -259,6 +271,24 @@ Kill text between cursor and a selected character
 
   (setq slime-lisp-implementations
 	'((sbcl ("sbcl" "--core" "sbcl.core-for-slime"))))
+#+END_SRC
+**** Lisp
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
+  (add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
+  (add-hook 'emacs-lisp-mode-hook 'company-mode)
+
+  (use-package slime-company
+    :ensure t
+    :init
+    (require 'company)
+    (slime-setup '(slime-fancy slime-company)))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-defined
+    :ensure t
+    :config
+    (add-hook 'emacs-lisp-mode-hook 'highlight-defined-mode))
 #+END_SRC
 *** Version control
 #+BEGIN_SRC emacs-lisp
@@ -342,54 +372,6 @@ Kill text between cursor and a selected character
   (require 'company)
   (add-hook 'shell-mode-hook 'shell-mode-company-init))
 #+END_SRC
-**** C
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'c-mode-hook 'yas-minor-mode)
-
-  (use-package flycheck-clang-analyzer
-    :ensure t
-    :config
-    (with-eval-after-load 'flycheck
-      (require 'flycheck-clang-analyzer)
-      (flycheck-clang-analyzer-setup)))
-
-  (with-eval-after-load 'company
-    (add-hook 'c-mode-hook 'company-mode))
-
-  (use-package company-c-headers
-    :ensure t)
-
-  (use-package company-irony
-    :ensure t
-    :config
-    (setq company-backends '((company-c-headers
-			      company-dabbrev-code
-			      company-irony))))
-
-  (use-package irony
-    :ensure t
-    :config
-    (add-hook 'c-mode-hook 'irony-mode)
-    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
-#+END_SRC
-**** Lisp
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
-  (add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
-  (add-hook 'emacs-lisp-mode-hook 'company-mode)
-
-  (use-package slime-company
-    :ensure t
-    :init
-    (require 'company)
-    (slime-setup '(slime-fancy slime-company)))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp
-  (use-package highlight-defined
-    :ensure t
-    :config
-    (add-hook 'emacs-lisp-mode-hook 'highlight-defined-mode))
-#+END_SRC
 *** Go
 **** Gomode
 #+BEGIN_SRC emacs-lisp
@@ -454,80 +436,6 @@ When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
 		  LaTeX-section-section
 		  LaTeX-section-label))
 #+END_SRC
-** IDE-layout
-*** File-browser
 
-#+BEGIN_SRC emacs-lisp
-  (use-package treemacs
-    :ensure t
-    :defer t
-    :config
-    (progn
-      (setq treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist")
-	    treemacs-deferred-git-apply-delay      0.5
-	    treemacs-directory-name-transformer    #'identity
-	    treemacs-display-in-side-window        t
-	    treemacs-eldoc-display                 t
-	    treemacs-file-event-delay              5000
-	    treemacs-file-extension-regex          treemacs-last-period-regex-value
-	    treemacs-file-follow-delay             0.2
-	    treemacs-file-name-transformer         #'identity
-	    treemacs-follow-after-init             t
-	    treemacs-is-never-other-window         nil
-	    treemacs-max-git-entries               5000
-	    treemacs-missing-project-action        'ask
-	    treemacs-no-png-images                 nil
-	    treemacs-no-delete-other-window        t
-	    treemacs-project-follow-cleanup        nil
-	    treemacs-position                      'left
-	    treemacs-recenter-distance             0.1
-	    treemacs-recenter-after-file-follow    nil
-	    treemacs-recenter-after-tag-follow     nil
-	    treemacs-recenter-after-project-jump   'always
-	    treemacs-recenter-after-project-expand 'on-distance
-	    treemacs-show-cursor                   nil
-	    treemacs-show-hidden-files             t
-	    treemacs-silent-filewatch              nil
-	    treemacs-silent-refresh                nil
-	    treemacs-sorting                       'alphabetic-asc
-	    treemacs-space-between-root-nodes      t
-	    treemacs-tag-follow-cleanup            t
-	    treemacs-tag-follow-delay              1.5
-	    treemacs-width                         35)
 
-      (treemacs-follow-mode t)
-      (treemacs-filewatch-mode t)
-      (treemacs-fringe-indicator-mode t))
-    :bind
-    (:map global-map
-	  ("C-x t 1"   . treemacs-delete-other-windows)
-	  ("C-x t t"   . treemacs)
-	  ("C-x t B"   . treemacs-bookmark)
-	  ("C-x t C-t" . treemacs-find-file)
-	  ("C-x t M-t" . treemacs-find-tag)
-	  ("C-x t n"   . treemacs-add-project)))
-#+END_SRC
-*** Linenumbers
-#+BEGIN_SRC emacs-lisp
-  (setq line-number-mode t)
-  (setq column-number-mode t)
-#+END_SRC
-#+BEGIN_SRC emacs-lisp
-  (use-package linum-relative
-    :ensure t
-    :config
-    (add-hook 'prog-mode-hook 'linum-relative-mode))
-#+END_SRC
-*** Tabs
-Awesome-tabs!
-#+BEGIN_SRC emacs-lisp
-  (use-package awesome-tab
-    :load-path "~/.emacs.d/lisp/"
-    :config
-    (awesome-tab-mode t))
-#+END_SRC
-*** Shell 
-#+BEGIN_SRC emacs-lisp
-  (require 'aweshell)
-#+END_SRC
 
