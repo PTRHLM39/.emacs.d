@@ -168,8 +168,6 @@
   :config
   (load-theme 'monokai t))
 
-
-
 (setq scroll-conservatively 100)
 
 (defalias 'yes-or-no-p 'y-or-n-p)

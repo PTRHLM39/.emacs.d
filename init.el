@@ -29,7 +29,6 @@
 (package-refresh-contents)
 (package-install 'use-package))
 
-
 (setq select-enable-clipboard t)
 
 ;; Asynchronous processing
@@ -46,8 +45,6 @@
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
   (setq inferior-lisp-program "sbcl")
 
-(require 'aweshell)
-
 ;;; init.el ends here
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -56,7 +53,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (monokai-theme zzz-to-char yaxception yasnippet-snippets which-key use-package treemacs switch-window sudo-edit smartparens slime-company rich-minority pretty-mode nord-theme mark-multiple magit lsp-ui log4e linum-relative hungry-delete highlight-defined go-snippets go-playground flycheck-clang-analyzer fancy-battery expand-region doom-modeline dired-narrow company-shell company-lsp company-irony company-c-headers autothemer anaphora))))
+    (dap-mode lsp-java projectile ob-docker-build quelpa zzz-to-char yaxception yasnippet-snippets which-key use-package treemacs switch-window sudo-edit smartparens slime-company rich-minority pretty-mode nord-theme monokai-theme mark-multiple magit lsp-ui log4e linum-relative hungry-delete highlight-defined go-snippets go-playground flycheck-clang-analyzer fancy-battery expand-region doom-modeline dired-narrow company-shell company-lsp company-irony company-c-headers autothemer anaphora))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

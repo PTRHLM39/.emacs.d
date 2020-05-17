@@ -4,7 +4,7 @@ It's structured in source-blocks and when evaluated,
 it will tangle up into one or more loadable .el-files.
 Their path's are defined in init.el, ready to be loaded.
 
-By this way, makes it simple to maintain, read and organize
+By this way, makes it easy to maintain, read and organize
 files which tend to clutter up easily.
 ** Visit and edit configurations
 Edit emacs configuration.
@@ -59,7 +59,6 @@ Evaluate config with key-sequence *C-c l*
   (global-set-key (kbd "C-s") 'helm-occur-from-isearch)
   (global-set-key (kbd "C-x /") 'helm-find)
 #+END_SRC
-**** Helm-spotify
 *** Mini-buffer
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
@@ -235,9 +234,6 @@ Kill text between cursor and a selected character
     :config
     (load-theme 'monokai t))
 #+END_SRC
-#+BEGIN_SRC emacs-lisp
-
-#+END_SRC
 *** Interface
 **** Scrolling
 #+BEGIN_SRC emacs-lisp
@@ -249,11 +245,11 @@ Kill text between cursor and a selected character
 #+END_SRC
 **** Pretty symbols
      #+BEGIN_SRC emacs-lisp
-  (when window-system
-    (use-package pretty-mode
-      :ensure t
-      :config
-      (global-pretty-mode t)))
+       (when window-system
+	 (use-package pretty-mode
+	   :ensure t
+	   :config
+	   (global-pretty-mode t)))
      #+END_SRC
 ** Programtext tools
 *** Lisp
@@ -436,6 +432,7 @@ When done, hit *M-x go-playgound-rm RET* to remove and leave playgound.
 		  LaTeX-section-section
 		  LaTeX-section-label))
 #+END_SRC
+
 
 
 
