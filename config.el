@@ -32,11 +32,24 @@
       helm-ff-search-library-in-sexp        t
       helm-ff-file-name-history-use-recentf t)
 
-(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "M-x")     'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
-(global-set-key (kbd "M-y") 'helm-show-kill-ring)
-(global-set-key (kbd "C-s") 'helm-occur-from-isearch)
-(global-set-key (kbd "C-x /") 'helm-find)
+(global-set-key (kbd "M-y")     'helm-show-kill-ring)
+(global-set-key (kbd "C-:")     'helm-occur-from-isearch)
+(global-set-key (kbd "C-x f")   'helm-find)
+(global-set-key (kbd "C-x C-b") 'helm-buffers-list)
+
+(use-package switch-window
+  :ensure t
+  :config
+  (setq switch-window-input-style 'minibuffer)
+  (setq switch-window-increace 4)
+  (setq switch-window-threshold 2)
+  (setq switch-window-shortcut-style 'qwerty)
+  (setq switch-window-qwerty-shortcuts
+	'("a" "s" "d" "f" "j" "k" "l" "i" "o"))
+  :bind
+  ([remap other-window] . switch-window))
 
 (use-package which-key
   :ensure t
@@ -80,21 +93,9 @@
   :ensure t
   :bind ("M-z" . zzz-up-to-char))
 
-(use-package switch-window
-  :ensure t
-  :config
-  (setq switch-window-input-style 'minibuffer)
-  (setq switch-window-increace 4)
-  (setq switch-window-threshold 2)
-  (setq switch-window-shortcut-style 'qwerty)
-  (setq switch-window-qwerty-shortcuts
-	'("a" "s" "d" "f" "j" "k" "l" "i" "o"))
-  :bind
-  ([remap other-window] . switch-window))
-
 (use-package avy
   :ensure t
-  :bind ("M-s" . avy-goto-word-1))
+  :bind ("M-s" . 'avy-goto-word-1))
 
 (defun split-and-follow-horizontally ()
   (interactive)
@@ -114,11 +115,11 @@
 (set-terminal-coding-system 'utf-8)
 
 (defvar my-term-shell "/bin/bash")
-(defadvice ansi-term (before force-bash)
+(defadvice eshell (before force-bash)
   (interactive (list my-term-shell)))
-(ad-activate 'ansi-term)
+(ad-activate 'eshell)
 
-(global-set-key (kbd "C-.") 'ansi-term)
+(global-set-key (kbd "C-.") 'eshell)
 
 ;; Disable startup-message
 (setq inhibit-startup-message t)
@@ -163,10 +164,35 @@
  (use-package all-the-icons
   :ensure t))
 
-(use-package monokai-theme
+(use-package kaolin-themes
   :ensure t
   :config
-  (load-theme 'monokai t))
+  (load-theme 'kaolin-light t))
+
+(defvar *theme-dark*     'kaolin-dark)
+(defvar *theme-light*   'kaolin-light)
+(defvar *current-theme* *theme-light*)
+
+(defadvice load-theme (before theme-dont-propagate activate)
+  "Disable theme before loading another."
+  (mapcar #'disable-theme custom-enabled-themes))
+
+(defun next-theme (theme)
+  "Toggle next THEME."
+  (if (eq theme 'default)
+      (disable-theme *current-theme*)
+    (progn
+      (load-theme theme t)))
+  (setq *current-theme* theme))
+
+(defun toggle-theme ()
+  "Conditioning toggle through theme-list."
+  (interactive)
+  (cond ((eq *current-theme* *theme-dark*)  (next-theme *theme-light*))
+	((eq *current-theme* *theme-light*) (next-theme 'default))
+	((eq *current-theme* 'default)      (next-theme *theme-dark*))))
+
+(global-set-key (kbd "C-c t") 'toggle-theme)
 
 (setq scroll-conservatively 100)
 
@@ -182,14 +208,9 @@
     :ensure t
     :config
     (setq inferior-lisp-program "/usr/bin/sbcl")
-    (setq slime-contribs '(slime-fancy)))
-
-(add-hook 'slime-load-hook
-	   (lambda ()
-	     (define-key slime-prefix-map (kbd "M-h")'slime-documentation-lookup)))
-
-(setq slime-lisp-implementations
-      '((sbcl ("sbcl" "--core" "sbcl.core-for-slime"))))
+    (setq slime-contribs '(slime-fancy))
+    (setq common-lisp-hyperspec-root
+	  (concat "file://" (expand-file-name "~/quicklisp/local-clhs/"))))
 
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 (add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
@@ -300,14 +321,20 @@
   :ensure t
   :commands company-lsp)
 
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
+
 (use-package org
   :ensure t
   :pin org
   :config
   (org-babel-do-load-languages 'org-babel-load-languages
-			       '(
-				 (shell .t)
-				 )))
+			       '((shell .t))))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((dot . t)))
 
 (load "auctex.el" nil t t)
 (load "preview-latex.el" nil t t)
