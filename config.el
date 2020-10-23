@@ -1,3 +1,4 @@
+
 (defun config-visit ()
   (interactive)
   (find-file "~/.emacs.d/config.org"))
@@ -19,25 +20,26 @@
   (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
 (global-set-key (kbd "C-c l") 'config-eval)
 
-(require 'helm)
-(require 'helm-config)
+(use-package helm
+  :ensure t
+  :config
+  
+  (global-set-key (kbd "C-c h") 'helm-command-prefix)
+  (global-unset-key (kbd "C-x c"))
 
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
-(global-unset-key (kbd "C-x c"))
+  (define-key helm-map (kbd "C-z") 'helm-select-action)
 
-(define-key helm-map (kbd "C-z") 'helm-select-action)
+  (setq helm-split-window-in-side-p           t
+        helm-move-to-line-cycle-in-source     t
+        helm-ff-search-library-in-sexp        t
+        helm-ff-file-name-history-use-recentf t)
 
-(setq helm-split-window-in-side-p           t
-      helm-move-to-line-cycle-in-source     t
-      helm-ff-search-library-in-sexp        t
-      helm-ff-file-name-history-use-recentf t)
-
-(global-set-key (kbd "M-x")     'helm-M-x)
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
-(global-set-key (kbd "M-y")     'helm-show-kill-ring)
-(global-set-key (kbd "C-:")     'helm-occur-from-isearch)
-(global-set-key (kbd "C-x f")   'helm-find)
-(global-set-key (kbd "C-x C-b") 'helm-buffers-list)
+  (global-set-key (kbd "M-x")     'helm-M-x)
+  (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "M-y")     'helm-show-kill-ring)
+  (global-set-key (kbd "C-:")     'helm-occur-from-isearch)
+  (global-set-key (kbd "C-x f")   'helm-find)
+  (global-set-key (kbd "C-x C-b") 'helm-buffers-list))
 
 (use-package switch-window
   :ensure t
@@ -47,7 +49,7 @@
   (setq switch-window-threshold 2)
   (setq switch-window-shortcut-style 'qwerty)
   (setq switch-window-qwerty-shortcuts
-	'("a" "s" "d" "f" "j" "k" "l" "i" "o"))
+        '("a" "s" "d" "f" "j" "k" "l" "i" "o"))
   :bind
   ([remap other-window] . switch-window))
 
@@ -189,8 +191,8 @@
   "Conditioning toggle through theme-list."
   (interactive)
   (cond ((eq *current-theme* *theme-dark*)  (next-theme *theme-light*))
-	((eq *current-theme* *theme-light*) (next-theme 'default))
-	((eq *current-theme* 'default)      (next-theme *theme-dark*))))
+        ((eq *current-theme* *theme-light*) (next-theme 'default))
+        ((eq *current-theme* 'default)      (next-theme *theme-dark*))))
 
 (global-set-key (kbd "C-c t") 'toggle-theme)
 
@@ -210,7 +212,7 @@
     (setq inferior-lisp-program "/usr/bin/sbcl")
     (setq slime-contribs '(slime-fancy))
     (setq common-lisp-hyperspec-root
-	  (concat "file://" (expand-file-name "~/quicklisp/local-clhs/"))))
+          (concat "file://" (expand-file-name "~/quicklisp/local-clhs/"))))
 
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 (add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
@@ -254,7 +256,7 @@
     "Disables flychecks that could be problematic in org-mode"
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
   :hook ((prog-mode . flycheck-mode)
-	 (org-src-mode . disable-flycheck-in-org-src-block)))
+         (org-src-mode . disable-flycheck-in-org-src-block)))
 
 (use-package company
   :ensure t
@@ -284,42 +286,15 @@
 
 (defun shell-mode-company-init ()
   (setq-local company-backends '((company-shell
-				  company-shell-env
-				  company-etags
-				  company-dabbrev-code))))
+                                  company-shell-env
+                                  company-etags
+                                  company-dabbrev-code))))
 
 (use-package company-shell
 :ensure t
 :config
 (require 'company)
 (add-hook 'shell-mode-hook 'shell-mode-company-init))
-
-(use-package go-mode
-  :ensure t
-  :config
-  (add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
-  (require 'go-flymake))
-
-(use-package go-playground
-  :ensure t)
-
-(use-package lsp-mode
-  :ensure t
-  :commands (lsp lsp-deferred)
-  :hook (go-mode . lsp-deferred))
-
-(defun lsp-go-install-save-hooks ()
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
-(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-
-(use-package lsp-ui
-  :ensure t
-  :commands lsp-ui-mode)
-
-(use-package company-lsp
-  :ensure t
-  :commands company-lsp)
 
 (use-package elpy
   :ensure t
@@ -331,21 +306,7 @@
   :pin org
   :config
   (org-babel-do-load-languages 'org-babel-load-languages
-			       '((shell .t))))
+                               ))
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((dot . t)))
-
-(load "auctex.el" nil t t)
-(load "preview-latex.el" nil t t)
-
-(setq TeX-auto-save  t
-      TeX-parse-self t)
-(setq-default TeX-master nil)
-
-(setq LaTeX-section-hook
-		'(LaTeX-section-heading
-		LaTeX-section-title
-		LaTeX-section-toc
-		LaTeX-section-section
-		LaTeX-section-label))
